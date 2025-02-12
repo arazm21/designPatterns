@@ -1,0 +1,50 @@
+from typing import Generator
+
+import pytest
+from fastapi.testclient import TestClient
+
+from database.connection import close_db, enable_test_mode, get_connection, init_db
+from main import app
+
+
+@pytest.fixture(scope="function", autouse=True)
+def test_client() -> Generator[TestClient, None, None]:
+    """Fixture for setting up the test client and database."""
+    enable_test_mode()  # Enable test mode for in-memory database
+    init_db()  # Initialize the test database schema
+    client = TestClient(app)
+    # yield client
+    connection = get_connection()
+
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM units")  # Clear the units table
+    cursor.execute("DELETE FROM products")
+    cursor.execute("DELETE FROM receipts")
+    cursor.execute("DELETE FROM receipt_products")
+    connection.commit()
+    yield client
+    close_db()  # Ensure the database connection is closed after each test
+
+# @pytest.fixture(scope="function")
+# def clean_db():
+#     """Fixture to clean the database after a test."""
+#     yield  # Wait until the test is done
+#     connection = get_connection()
+#     cursor = connection.cursor()
+#     cursor.execute("DELETE FROM units")
+#     cursor.execute("DELETE FROM products")
+#     cursor.execute("DELETE FROM receipts")
+#     cursor.execute("DELETE FROM receipt_products")
+#     connection.commit()
+#
+#
+
+
+
+# @pytest.fixture(scope="function", autouse=True)
+# def clean_database():
+#     """Clean the database before each test."""
+#     connection = get_connection()
+#     cursor = connection.cursor()
+#     cursor.execute("DELETE FROM units")  # Clear the units table
+#     connection.commit()
