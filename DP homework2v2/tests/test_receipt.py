@@ -18,7 +18,7 @@ def make_example_products(test_client: TestClient) -> Response:
     # Create unit and product
     unit_response = test_client.post("/units", json={"name": "kg"})
     assert unit_response.status_code == 201
-    unit_id = unit_response.json()["id"]
+    unit_id = unit_response.json()["unit"]["id"]
 
     response = test_client.post(
         "/products",

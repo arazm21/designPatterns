@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -6,16 +6,16 @@ from models.receipt import Receipt, ReceiptProductAdd, ReceiptStatusUpdate
 from repositories.receipt_repository import ReceiptRepository
 from services.receipt_service import ReceiptService
 
-router = APIRouter()
+router = APIRouter(prefix="/receipts", tags=["receipts"])
 service = ReceiptService(repository=ReceiptRepository())
 
 
-@router.post("/receipts", status_code=201)
+@router.post("", status_code=201)
 def create_receipt() -> Dict[str, Receipt]:
     return {"receipt": service.create_receipt()}
 
 
-@router.post("/receipts/{receipt_id}/products", status_code=201)
+@router.post("/{receipt_id}/products", status_code=201)
 def add_product_to_receipt(receipt_id: str,
                            product: ReceiptProductAdd) -> Dict[str, Receipt]:
     try:
@@ -26,7 +26,7 @@ def add_product_to_receipt(receipt_id: str,
         raise HTTPException(status_code=404, detail={"error": {"message": str(e)}})
 
 
-@router.get("/receipts/{receipt_id}")
+@router.get("/{receipt_id}")
 def get_receipt(receipt_id: str) -> Dict[str, Receipt]:
     try:
         return {"receipt": service.get_receipt(receipt_id)}
@@ -34,21 +34,21 @@ def get_receipt(receipt_id: str) -> Dict[str, Receipt]:
         raise HTTPException(status_code=404, detail={"error": {"message": str(e)}})
 
 
-@router.patch("/receipts/{receipt_id}")
+@router.patch("/{receipt_id}")
 def update_receipt_status(receipt_id: str,
-                          update: ReceiptStatusUpdate) -> None:
+                          update: ReceiptStatusUpdate) -> dict[str, Any]:
     try:
         service.update_receipt_status(receipt_id, update.status)
-        return
+        return {}
     except ValueError as e:
         raise HTTPException(status_code=404, detail={"error": {"message": str(e)}})
 
 
-@router.delete("/receipts/{receipt_id}")
-def delete_receipt(receipt_id: str) -> None:
+@router.delete("/{receipt_id}")
+def delete_receipt(receipt_id: str) -> dict[str, Any]:
     try:
         service.delete_receipt(receipt_id)
-        return
+        return {}
     except ValueError as e:
         status_code = 403 if "closed" in str(e) else 404
         raise HTTPException(status_code=status_code,

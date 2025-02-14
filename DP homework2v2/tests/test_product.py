@@ -7,7 +7,7 @@ def test_create_product_success(test_client: TestClient) -> None:
     """Test creating a product successfully."""
     # Create a unit to associate with the product
     unit_response = test_client.post("/units", json={"name": "kg"})
-    unit_id = unit_response.json()["id"]
+    unit_id = unit_response.json()["unit"]["id"]
 
     response = test_client.post(
         "/products",
@@ -30,7 +30,7 @@ def test_create_product_conflict(test_client: TestClient) -> None:
     """Test creating a product with a duplicate barcode."""
     # Create a unit to associate with the product
     unit_response = test_client.post("/units", json={"name": "kg"})
-    unit_id = unit_response.json()["id"]
+    unit_id = unit_response.json()["unit"]["id"]
 
     # Create the product
     test_client.post(
@@ -63,7 +63,7 @@ def test_read_product_success(test_client: TestClient) -> None:
     """Test retrieving a product by ID successfully."""
     # Create a unit and a product
     unit_response = test_client.post("/units", json={"name": "kg"})
-    unit_id = unit_response.json()["id"]
+    unit_id = unit_response.json()["unit"]["id"]
 
     product_response = test_client.post(
         "/products",
@@ -100,7 +100,7 @@ def test_list_products(test_client: TestClient) -> None:
     """Test listing all products."""
     # Create a unit and some products
     unit_response = test_client.post("/units", json={"name": "kg"})
-    unit_id = unit_response.json()["id"]
+    unit_id = unit_response.json()["unit"]["id"]
 
     test_client.post(
         "/products",
@@ -135,7 +135,7 @@ def test_update_product_success(test_client: TestClient) -> None:
     """Test updating a product successfully."""
     # Create a unit and a product
     unit_response = test_client.post("/units", json={"name": "kg"})
-    unit_id = unit_response.json()["id"]
+    unit_id = unit_response.json()["unit"]["id"]
 
     product_response = test_client.post(
         "/products",

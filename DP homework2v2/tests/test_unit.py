@@ -8,7 +8,7 @@ def test_create_unit_success(test_client: TestClient) -> None:
     response = test_client.post("/units", json={"name": "kg"})
     assert response.status_code == 201
     data = response.json()
-    assert data["name"] == "kg"
+    assert data["unit"]["name"] == "kg"
 
 
 def test_create_unit_conflict(test_client: TestClient) -> None:
@@ -23,13 +23,13 @@ def test_create_unit_conflict(test_client: TestClient) -> None:
 def test_read_unit_success(test_client: TestClient) -> None:
     """Test retrieving a unit by ID successfully."""
     create_response = test_client.post("/units", json={"name": "g"})
-    unit_id = create_response.json()["id"]
+    unit_id = create_response.json()["unit"]["id"]
 
     response = test_client.get(f"/units/{unit_id}")
     assert response.status_code == 200
     data = response.json()
-    assert data["id"] == unit_id
-    assert data["name"] == "g"
+    assert data["unit"]["id"] == unit_id
+    assert data["unit"]["name"] == "g"
 
 
 def test_read_unit_not_found(test_client: TestClient) -> None:

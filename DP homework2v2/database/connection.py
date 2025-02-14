@@ -26,6 +26,7 @@ def get_connection() -> Connection:
 
 def init_db() -> None:
     """Initialize the database schema."""
+
     connection = get_connection()
     cursor = connection.cursor()
     cursor.executescript("""
@@ -35,7 +36,7 @@ def init_db() -> None:
         );
     """)
     cursor.executescript("""
-            CREATE TABLE products (
+            CREATE TABLE IF NOT EXISTS products (
             id TEXT PRIMARY KEY,        -- UUID for the product ID
             unit_id TEXT NOT NULL,      -- Foreign key to the units table
             name TEXT NOT NULL,         -- Name of the product

@@ -25,7 +25,7 @@ class ReceiptRepository:
     @staticmethod
     def add_product_to_receipt(receipt_id: str,
                                product_id: str, quantity: int) -> Receipt:
-        """Add a product to a receipt."""
+        """Add a product to a receipt or update quantity if it already exists."""
         connection = get_connection()
         cursor = connection.cursor()
 
@@ -44,28 +44,41 @@ class ReceiptRepository:
 
         total_price = product.price * quantity
 
-        # Insert or update the product in the receipt
+        # Check if the product is already in the receipt
         cursor.execute(
-            "INSERT INTO receipt_products (receipt_id, product_id, "
-            "quantity, price, total) "
-            "VALUES (?, ?, ?, ?, ?) "
-            # "ON CONFLICT(receipt_id, product_id) DO UPDATE SET "
-            # "quantity = quantity + ?, total = total + ?"
-            ,
-            (receipt_id, product_id, quantity, product.price, total_price
-             # , quantity, total_price
-             )
+            "SELECT quantity, total FROM receipt_products "
+            "WHERE receipt_id = ? AND product_id = ?",
+            (receipt_id, product_id)
         )
+        existing_product = cursor.fetchone()
+
+        if existing_product:
+            # Product already in receipt, update the quantity and total price
+            new_quantity = quantity
+            new_total = total_price
+
+            cursor.execute(
+                "UPDATE receipt_products SET quantity = ?, total = ? "
+                "WHERE receipt_id = ? AND product_id = ?",
+                (new_quantity, new_total, receipt_id, product_id)
+            )
+        else:
+            # Insert new product into receipt
+            cursor.execute(
+                "INSERT INTO receipt_products (receipt_id, "
+                "product_id, quantity, price, total) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (receipt_id, product_id, quantity, product.price, total_price)
+            )
 
         # Update receipt total
         cursor.execute(
-            "UPDATE receipts SET total = total + ? WHERE id = ?",
+            "UPDATE receipts SET total = ? WHERE id = ?",
             (total_price, receipt_id)
         )
 
         connection.commit()
         return ReceiptRepository.get_receipt_by_id(receipt_id)
-
     @staticmethod
     def get_receipt_by_id(receipt_id: str) -> Receipt:
         """Retrieve a receipt by its ID."""
@@ -118,8 +131,8 @@ class ReceiptRepository:
         receipt = cursor.fetchone()
         if not receipt:
             raise ValueError(f"Receipt with id<{receipt_id}> does not exist.")
-        if receipt["status"] == "closed":
-            raise ValueError(f"Receipt with id<{receipt_id}> is closed.")
+        # if receipt["status"] == "closed":
+        #     raise ValueError(f"Receipt with id<{receipt_id}> is closed.")
 
         cursor.execute("DELETE FROM receipts WHERE id = ?", (receipt_id,))
         connection.commit()

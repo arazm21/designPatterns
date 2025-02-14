@@ -16,11 +16,11 @@ CREATE TABLE IF NOT EXISTS receipts (
     total INTEGER NOT NULL DEFAULT 0
 );
 
+
 CREATE TABLE IF NOT EXISTS receipt_products (
     receipt_id TEXT NOT NULL,
     product_id TEXT NOT NULL,
     quantity INTEGER NOT NULL,
     price INTEGER NOT NULL,
     total INTEGER NOT NULL,
-
 );
