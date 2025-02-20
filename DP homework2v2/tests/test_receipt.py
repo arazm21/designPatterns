@@ -140,3 +140,37 @@ def test_delete_receipt_success(test_client: TestClient) -> None:
 
     response = test_client.get(f"/receipts/{receipt_id}")
     assert response.status_code == 404
+# __________________________________----
+
+
+def test_add_product_to_receipt_failure_invalid_receipt(test_client: TestClient) -> None:
+    """Test adding a product to a non-existent receipt."""
+    receipt_id = uuid.uuid4()
+    product_id = uuid.uuid4()
+
+    response = test_client.post(
+        f"/receipts/{receipt_id}/products",
+        json={"id": str(product_id), "quantity": 2},
+    )
+    assert response.status_code == 404
+    data = response.json()
+    assert data["detail"]["error"]["message"] == f"Receipt with id<{receipt_id}> does not exist."
+
+
+def test_add_product_to_receipt_failure_invalid_product(test_client: TestClient) -> None:
+    """Test adding a non-existent product to a receipt."""
+    response = test_client.post("/receipts")
+    receipt_id = response.json()["receipt"]["id"]
+    product_id = uuid.uuid4()
+
+    response = test_client.post(
+        f"/receipts/{receipt_id}/products",
+        json={"id": str(product_id), "quantity": 2},
+    )
+    assert response.status_code == 404
+    data = response.json()
+    assert data["detail"]["error"]["message"] == f"Product with id<{product_id}> does not exist."
+
+
+
+

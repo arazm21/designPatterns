@@ -55,6 +55,24 @@ def test_list_units(test_client: TestClient) -> None:
     assert "liters" in unit_names
     assert "pieces" in unit_names
 
+# ________________________-
+
+def test_create_unit_special_chars(test_client: TestClient) -> None:
+    """Test creating a unit with special characters."""
+    response = test_client.post("/units", json={"name": "@#%"})
+    assert response.status_code == 201
+    data = response.json()
+    assert data["unit"]["name"] == "@#%"
+
+
+def test_update_unit_conflict(test_client: TestClient) -> None:
+    """Test renaming a unit to an already existing unit's name."""
+    test_client.post("/units", json={"name": "meter"})
+    create_response = test_client.post("/units", json={"name": "inch"})
+    unit_id = create_response.json()["unit"]["id"]
+
+    response = test_client.patch(f"/units/{unit_id}", json={"name": "meter"})
+    assert response.status_code == 405
 
 
 

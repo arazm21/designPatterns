@@ -64,3 +64,5 @@ def test_add_things_to_cart(test_client: TestClient) -> None:
     data = response.json()
     assert data["n_receipts"] == 1
     assert data["revenue"] == 1040
+
+
