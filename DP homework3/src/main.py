@@ -1,12 +1,14 @@
 import time
-from weather_station import WeatherStation
+
 from observers.weather_display import WeatherDisplay
-from src.observers.wind_speed_alert import WindSpeedAlert
-from src.observers.temperature_alert import TemperatureAlert
+from weather_station import WeatherStation
+
 from src.observers.humidity_alert import HumidityAlert
+from src.observers.temperature_alert import TemperatureAlert
+from src.observers.wind_speed_alert import WindSpeedAlert
 
 
-def main():
+def main() -> None:
     weather_station = WeatherStation()
 
     # Initial observer (Weather Display)

@@ -3,7 +3,8 @@ from typing import Protocol
 
 
 class Observer(Protocol):
-    """Defines the Observer interface that must be implemented by all weather system components."""
+    """Defines the Observer interface that must be
+    implemented by all weather system components."""
 
     @abstractmethod
     def update(self, temperature: float, humidity: float, wind_speed: float) -> None:

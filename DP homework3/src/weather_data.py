@@ -8,4 +8,5 @@ class WeatherData:
 
     def __str__(self) -> str:
         """String representation of weather data."""
-        return f"Temperature: {self.temperature}°C, Humidity: {self.humidity}%, Wind Speed: {self.wind_speed} km/h"
+        return (f"Temperature: {self.temperature}°C, "
+                f"Humidity: {self.humidity}%, Wind Speed: {self.wind_speed} km/h")

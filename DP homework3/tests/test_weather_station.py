@@ -1,12 +1,7 @@
-import pytest
 from _pytest.capture import CaptureFixture
 
-from src.weather_station import WeatherStation
 from src.observers.weather_display import WeatherDisplay
-from src.observers.temperature_alert import TemperatureAlert
-from src.observers.wind_speed_alert import WindSpeedAlert
-from src.observers.humidity_alert import HumidityAlert
-from src.observer import Observer, Subject
+from src.weather_station import WeatherStation
 
 
 def test_register_observer() -> None:
@@ -58,4 +53,5 @@ def test_notify_observers(capfd: CaptureFixture[str]) -> None:
     station.set_weather_data(30.5, 60, 10)
 
     out, _ = capfd.readouterr()  # Capture printed output
-    assert "WeatherDisplay: Temperature = 30.5°C, Humidity = 60%, Wind Speed = 10 km/h" in out
+    assert ("WeatherDisplay: Temperature = 30.5°C, "
+            "Humidity = 60%, Wind Speed = 10 km/h") in out
